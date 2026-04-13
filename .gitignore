@@ -1,4 +1,6 @@
 node_modules/
+.vscode/
+lib/
 .env
 npm-debug.log*
 .DS_Store
