@@ -3,7 +3,6 @@ package com.supplychain.service;
 import com.supplychain.dto.InventoryAlert;
 import com.supplychain.model.Inventory;
 import com.supplychain.repository.InventoryRepository;
-import com.supplychain.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -12,15 +11,12 @@ import java.util.*;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    private final ProductRepository productRepository;
 
     private static final int LOW_STOCK_THRESHOLD = 10;
-    private static final int OVERSTOCK_THRESHOLD = 200;
     private static final int REORDER_POINT = 15;
 
-    public InventoryService(InventoryRepository inventoryRepository, ProductRepository productRepository) {
+    public InventoryService(InventoryRepository inventoryRepository) {
         this.inventoryRepository = inventoryRepository;
-        this.productRepository = productRepository;
     }
 
     public List<Inventory> findAll() {

@@ -4,8 +4,6 @@ import com.supplychain.model.Order;
 import com.supplychain.model.enums.OrderStatus;
 import com.supplychain.model.enums.Priority;
 import com.supplychain.repository.OrderRepository;
-import com.supplychain.repository.ProductRepository;
-import com.supplychain.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,15 +14,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
-    private final CustomerRepository customerRepository;
     private final AtomicInteger idCounter = new AtomicInteger(1000);
 
-    public OrderService(OrderRepository orderRepository, ProductRepository productRepository,
-                      CustomerRepository customerRepository) {
+    public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
-        this.customerRepository = customerRepository;
     }
 
     public List<Order> findAll() {

@@ -1,6 +1,7 @@
 package com.supplychain.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -38,6 +39,30 @@ public class Inventory {
     @Column(name = "reorder_point")
     private Integer reorderPoint = 15;
 
+    @Column(name = "batch_number", length = 50)
+    private String batchNumber;
+
+    @Column(name = "manufacturing_date")
+    private LocalDate manufacturingDate;
+
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
+
+    @Transient
+    private Integer availableQty;
+
+    @Transient
+    private Integer avgDailyDemand;
+
+    @Transient
+    private Integer safetyStock;
+
+    @Transient
+    private Integer recommendedReorderQty;
+
+    @Transient
+    private String stockStatus;
+
     @Column(name = "last_updated")
     private LocalDateTime lastUpdated = LocalDateTime.now();
 
@@ -63,6 +88,22 @@ public class Inventory {
     public void setMaxCapacity(Integer maxCapacity) { this.maxCapacity = maxCapacity; }
     public Integer getReorderPoint() { return reorderPoint; }
     public void setReorderPoint(Integer reorderPoint) { this.reorderPoint = reorderPoint; }
+    public String getBatchNumber() { return batchNumber; }
+    public void setBatchNumber(String batchNumber) { this.batchNumber = batchNumber; }
+    public LocalDate getManufacturingDate() { return manufacturingDate; }
+    public void setManufacturingDate(LocalDate manufacturingDate) { this.manufacturingDate = manufacturingDate; }
+    public LocalDate getExpiryDate() { return expiryDate; }
+    public void setExpiryDate(LocalDate expiryDate) { this.expiryDate = expiryDate; }
+    public Integer getAvailableQty() { return availableQty; }
+    public void setAvailableQty(Integer availableQty) { this.availableQty = availableQty; }
+    public Integer getAvgDailyDemand() { return avgDailyDemand; }
+    public void setAvgDailyDemand(Integer avgDailyDemand) { this.avgDailyDemand = avgDailyDemand; }
+    public Integer getSafetyStock() { return safetyStock; }
+    public void setSafetyStock(Integer safetyStock) { this.safetyStock = safetyStock; }
+    public Integer getRecommendedReorderQty() { return recommendedReorderQty; }
+    public void setRecommendedReorderQty(Integer recommendedReorderQty) { this.recommendedReorderQty = recommendedReorderQty; }
+    public String getStockStatus() { return stockStatus; }
+    public void setStockStatus(String stockStatus) { this.stockStatus = stockStatus; }
     public LocalDateTime getLastUpdated() { return lastUpdated; }
     public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
 }

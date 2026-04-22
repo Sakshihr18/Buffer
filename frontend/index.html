@@ -718,6 +718,15 @@ canvas { display: block; width: 100%; height: 100%; }
     <button class="nav-btn" data-page="workforce"><span class="icon">👷</span> Workforce</button>
   </div>
 
+  <div class="nav-section">
+    <div class="nav-label">Engines</div>
+    <button class="nav-btn" data-page="replenishment"><span class="icon">📈</span> Replenishment</button>
+    <button class="nav-btn" data-page="fefo"><span class="icon">📅</span> FEFO</button>
+    <button class="nav-btn" data-page="sla"><span class="icon">⏱️</span> SLA</button>
+    <button class="nav-btn" data-page="delivery"><span class="icon">🛵</span> Delivery</button>
+    <button class="nav-btn" data-page="substitution"><span class="icon">🔃</span> Substitution</button>
+  </div>
+
   <div class="sidebar-footer">
     <div style="margin-bottom:6px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3)">Algorithms</div>
     <div class="algo-tags">
@@ -729,6 +738,8 @@ canvas { display: block; width: 100%; height: 100%; }
       <span class="algo-tag">Greedy</span>
       <span class="algo-tag">HashMap</span>
       <span class="algo-tag">Min-Heap</span>
+      <span class="algo-tag">KD-Tree</span>
+      <span class="algo-tag">FEFO</span>
     </div>
   </div>
 </nav>
@@ -993,6 +1004,212 @@ canvas { display: block; width: 100%; height: 100%; }
       </div>
     </div>
 
+    <!-- ── Replenishment ─────────────────────────── -->
+    <div class="page" id="page-replenishment">
+      <div class="page-header">
+        <div class="page-title">📈 Demand-Driven Replenishment</div>
+        <div class="page-subtitle">Predictive demand engine with auto-reorder suggestions</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Critical Stock</div>
+          <div class="stat-value" id="rep-critical" style="color:var(--red)">0</div>
+          <div class="stat-icon">🚨</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Low Stock</div>
+          <div class="stat-value" id="rep-low-stock" style="color:var(--yellow)">0</div>
+          <div class="stat-icon">⚠️</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Reorder</div>
+          <div class="stat-value" id="rep-pending">0</div>
+          <div class="stat-icon">📦</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Products</div>
+          <div class="stat-value" id="rep-products">0</div>
+          <div class="stat-icon">📋</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Reorder Queue</span>
+          <button class="btn btn-primary" onclick="renderReplenishment()">🔄 Evaluate</button>
+        </div>
+        <div id="replenishment-queue"></div>
+      </div>
+    </div>
+
+    <!-- ── FEFO ─────────────────────────────── -->
+    <div class="page" id="page-fefo">
+      <div class="page-header">
+        <div class="page-title">📅 FEFO Inventory</div>
+        <div class="page-subtitle">Earliest expiry first - prevent product expiration</div>
+      </div>
+      <div class="three-col" style="margin-bottom:20px">
+        <div class="alert alert-critical" id="fefo-expired-alert">
+          <span>❌ <strong id="fefo-expired-count">0</strong> Expired Batches</span>
+        </div>
+        <div class="alert alert-warning" id="fefo-expiring-alert">
+          <span>⚠️ <strong id="fefo-expiring-count">0</strong> Expiring Soon</span>
+        </div>
+        <div class="alert alert-info">
+          <span>📋 <strong id="fefo-total-count">0</strong> Total Batches</span>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Expiring Soon (30 days)</span></div>
+          <div id="fefo-expiring-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Picking Recommendation</span></div>
+          <div id="fefo-pick-form"></div>
+          <div id="fefo-pick-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLA ─────────────────────────────── -->
+    <div class="page" id="page-sla">
+      <div class="page-header">
+        <div class="page-title">⏱️ SLA-Aware Scheduling</div>
+        <div class="page-subtitle">Deadline-priority queue for on-time delivery</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Breached</div>
+          <div class="stat-value" id="sla-breached" style="color:var(--red)">0</div>
+          <div class="stat-icon">🚨</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Critical</div>
+          <div class="stat-value" id="sla-critical" style="color:var(--accent)">0</div>
+          <div class="stat-icon">⚡</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">At Risk</div>
+          <div class="stat-value" id="sla-at-risk" style="color:var(--yellow)">0</div>
+          <div class="stat-icon">⚠️</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">On Track</div>
+          <div class="stat-value" id="sla-on-track" style="color:var(--green)">0</div>
+          <div class="stat-icon">✅</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Order Schedule</span>
+          <button class="btn btn-primary" onclick="renderSLA()">🔄 Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order</th><th>Score</th><th>Hours Left</th><th>Status</th><th>Recommendation</th></tr></thead>
+            <tbody id="sla-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Delivery ─────────────────────────────── -->
+    <div class="page" id="page-delivery">
+      <div class="page-header">
+        <div class="page-title">🛵 Smart Delivery</div>
+        <div class="page-subtitle">KD-Tree nearest rider matching + live route insertion</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Riders</div>
+          <div class="stat-value" id="del-total-riders">0</div>
+          <div class="stat-icon">🛵</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Available</div>
+          <div class="stat-value" id="del-available" style="color:var(--green)">0</div>
+          <div class="stat-icon">✅</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active</div>
+          <div class="stat-value" id="del-active" style="color:var(--accent)">0</div>
+          <div class="stat-icon">🚚</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="del-pending">0</div>
+          <div class="stat-icon">⏳</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Find Nearest Rider</span></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>X Coordinate</label>
+              <input type="number" id="del-x" value="50" step="1">
+            </div>
+            <div class="form-group">
+              <label>Y Coordinate</label>
+              <input type="number" id="del-y" value="50" step="1">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="findNearestRider()">🔍 Find</button>
+          <div id="del-nearest-result" style="margin-top:16px"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Auto Assignment</span></div>
+          <button class="btn btn-primary" onclick="autoAssignRiders()">🤖 Auto Assign</button>
+          <div id="del-assign-result" style="margin-top:16px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Substitution ─────────────────────────── -->
+    <div class="page" id="page-substitution">
+      <div class="page-header">
+        <div class="page-title">🔃 Smart Substitution</div>
+        <div class="page-subtitle">AI-powered product alternatives when out of stock</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Out of Stock</div>
+          <div class="stat-value" id="sub-oos" style="color:var(--red)">0</div>
+          <div class="stat-icon">❌</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">With Substitutes</div>
+          <div class="stat-value" id="sub-with-sub" style="color:var(--green)">0</div>
+          <div class="stat-icon">✅</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">No Alternatives</div>
+          <div class="stat-value" id="sub-no-alt" style="color:var(--yellow)">0</div>
+          <div class="stat-icon">⚠️</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Products</div>
+          <div class="stat-value" id="sub-total">0</div>
+          <div class="stat-icon">📦</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Check Substitute</span></div>
+          <div class="form-group">
+            <label>Product ID</label>
+            <select id="sub-product-select"></select>
+          </div>
+          <button class="btn btn-primary" onclick="checkSubstitution()">🔍 Check</button>
+          <div id="sub-check-result" style="margin-top:16px"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Out of Stock Products</span></div>
+          <div id="sub-product-list"></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /content -->
 </div><!-- /main -->
 
@@ -1013,6 +1230,7 @@ canvas { display: block; width: 100%; height: 100%; }
 <script src="inventory.js"></script>
 <script src="routing.js"></script>
 <script src="tracking.js"></script>
+<script src="engines.js"></script>
 <script src="app.js"></script>
 
 <script>
@@ -1030,7 +1248,10 @@ document.querySelectorAll('[data-page]').forEach(btn => {
       'place-order': 'Place New Order', inventory: 'Inventory Management',
       routing: 'Route Optimizer', tracking: 'Live Tracking',
       vehicles: 'Fleet Management', returns: 'Returns Management',
-      workforce: 'Workforce Management'
+      workforce: 'Workforce Management',
+      replenishment: 'Demand-Driven Replenishment', fefo: 'FEFO Inventory',
+      sla: 'SLA-Aware Scheduling', delivery: 'Smart Delivery',
+      substitution: 'Smart Substitution'
     };
     const el = document.getElementById('topbar-title');
     if (el) el.textContent = titles[btn.dataset.page] || '';
